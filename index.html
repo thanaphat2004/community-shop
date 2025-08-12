@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>ชุมชนงานฝีมือ | ขายผ้ามัดย้อมและตะกร้าพลาสติก</title>
+<style>
+  body {
+    font-family: 'Sarabun', sans-serif, sans-serif;
+    background: #fff8f0;
+    margin: 0; padding: 0;
+    color: #333;
+  }
+  header {
+    background: #ff7043;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  h1 {
+    margin: 0;
+  }
+  .products {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem;
+    flex-wrap: wrap;
+  }
+  .product {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #ccc;
+    width: 320px;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+  .product img {
+    width: 100%;
+    border-radius: 6px;
+    height: 200px;
+    object-fit: cover;
+  }
+  .product h3 {
+    margin: 0.5rem 0 0.3rem;
+  }
+  .product p {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .price {
+    color: #d84315;
+    font-weight: bold;
+    margin: 0.7rem 0;
+  }
+  label {
+    display: block;
+    margin: 0.5rem 0 0.2rem;
+  }
+  select, input[type="file"] {
+    width: 100%;
+    padding: 0.4rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  button {
+    background: #ff7043;
+    border: none;
+    color: white;
+    padding: 0.7rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 0.7rem;
+    width: 100%;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #e64a19;
+  }
+  #cart {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #ff7043;
+    color: white;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 8px #ff7043aa;
+    z-index: 1000;
+  }
+  #cart-count {
+    font-size: 1.3rem;
+  }
+  /* Modal */
+  #cart-modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  #cart-modal .modal-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    max-width: 480px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  #cart-modal h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  #cart-items {
+    list-style: none;
+    padding-left: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+  #cart-items li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.3rem;
+  }
+  #cart-items li span {
+    flex: 1;
+  }
+  #cart-items li button.remove-btn {
+    background: #d84315;
+    border: none;
+    color: white;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 0.7rem;
+    font-size: 0.9rem;
+  }
+  #cart-modal .payment-info,
+  #cart-modal .contact-info {
+    background: #fff3e0;
+    border: 1px solid #ffccbc;
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #bf360c;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+  }
+  #cart-modal label {
+    margin-top: 1rem;
+  }
+  #cart-modal input[type="file"] {
+    margin-top: 0.3rem;
+  }
+  #cart-modal button.close-btn {
+    background: #d84315;
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 1rem;
+  }
+  /* หน้าแสดงสถานะหลังชำระ */
+  #order-status {
+    display: none;
+    max-width: 480px;
+    margin: 2rem auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #ccc;
+    text-align: center;
+  }
+  #order-status h2 {
+    color: #ff7043;
+  }
+  #order-status p {
+    font-size: 1.1rem;
+    margin: 1rem 0;
+  }
+  #order-status button {
+    width: auto;
+    padding: 0.7rem 2rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ตลาดชุมชนงานฝีมือ</h1>
+  <p>ขายผ้ามัดย้อมและตะกร้าจากเส้นใยพลาสติก</p>
+</header>
+
+<main>
+  <section class="products" id="product-list">
+    <!-- แสดงสินค้า -->
+  </section>
+</main>
+
+<div id="cart" title="ดูตะกร้าสินค้า">
+  🛒<span id="cart-count">0</span>
+</div>
+
+<!-- ตะกร้าสินค้า Modal -->
+<div id="cart-modal">
+  <div class="modal-content">
+    <h2>ตะกร้าสินค้า</h2>
+    <ul id="cart-items"></ul>
+
+    <div class="payment-info">
+      <strong>ช่องทางการชำระเงิน</strong><br/>
+      ชำระผ่านพร้อมเพย์: <br/>
+      <strong>093-326-4531</strong><br/>
+      ชื่อบัญชี: <strong>ธนพัฒน์ ภักดีจิตร</strong><br/>
+      (กรุณาแจ้งหลักฐานการโอนหลังชำระเงิน)
+    </div>
+
+    <div class="contact-info">
+      <strong>ช่องทางการติดต่อ</strong><br/>
+      โทร: 093-326-4531<br/>
+      Line ID: thanaphat123<br/>
+      อีเมล: thanaphat@example.com
+    </div>
+
+    <label for="slip-upload">แนบสลิปการโอนเงิน (ไฟล์ภาพ):</label>
+    <input type="file" id="slip-upload" accept="image/*" />
+
+    <button id="confirm-payment-btn">ยืนยันการชำระเงิน</button>
+    <button class="close-btn">ปิด</button>
+  </div>
+</div>
+
+<!-- หน้าแสดงสถานะคำสั่งซื้อ -->
+<div id="order-status">
+  <h2>ขอบคุณสำหรับการสั่งซื้อ!</h2>
+  <p>สถานะคำสั่งซื้อ: <strong>กำลังแพ็คสินค้า</strong></p>
+  <p>เราจะแจ้งสถานะจัดส่งให้ทราบอีกครั้งทางช่องทางติดต่อที่ให้ไว้</p>
+  <button id="back-to-shop-btn">กลับสู่หน้าร้าน</button>
+</div>
+
+<script>
+  const products = [
+    {
+      id: 1,
+      name: 'ผ้ามัดย้อม',
+      description: 'ผ้ามัดย้อมเนื้อนุ่ม ลายสวย เลือกขนาดได้',
+      price: 280,
+      image: 'images/ผ้ามัดย้อม.jpg',
+      sizes: ['S', 'M', 'L', 'XL', 'XXL']
+    },
+    {
+      id: 2,
+      name: 'ตะกร้าจากเส้นใยพลาสติก',
+      description: 'ตะกร้าทำมือจากเส้นใยพลาสติก แข็งแรง ทนทาน',
+      price: 450,
+      image: 'images/ตะกร้า.jpg'
+    }
+  ];
+
+  const productList = document.getElementById('product-list');
+  const cartCount = document.getElementById('cart-count');
+  const cartModal = document.getElementById('cart-modal');
+  const cartItemsList = document.getElementById('cart-items');
+  const closeBtn = cartModal.querySelector('.close-btn');
+  const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
+  const slipUpload = document.getElementById('slip-upload');
+  const orderStatusDiv = document.getElementById('order-status');
+  const backToShopBtn = document.getElementById('back-to-shop-btn');
+
+  let cart = [];
+  let slipFile = null;
+
+  // แสดงสินค้า
+  function renderProducts() {
+    productList.innerHTML = '';
+    products.forEach(product => {
+      const div = document.createElement('div');
+      div.classList.add('product');
+
+      let sizeSelectorHTML = '';
+      if (product.sizes) {
+        sizeSelectorHTML = `
+          <label for="size-${product.id}">เลือกขนาด:</label>
+          <select id="size-${product.id}">
+            ${product.sizes.map(s => `<option value="${s}">${s}</option>`).join('')}
+          </select>
+        `;
+      }
+
+      div.innerHTML = `
+        <img src="${product.image}" alt="${product.name}" />
+        <h3>${product.name}</h3>
+        <p>${product.description}</p>
+        <div class="price">${product.price} บาท</div>
+        ${sizeSelectorHTML}
+        <button onclick="addToCart(${product.id})">เพิ่มลงตะกร้า</button>
+      `;
+      productList.appendChild(div);
+    });
+  }
+
+  // เพิ่มสินค้าในตะกร้า
+  function addToCart(id) {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    let selectedSize = null;
+    if (product.sizes) {
+      const select = document.getElementById(`size-${id}`);
+      selectedSize = select ? select.value : null;
+    }
+
+    const existingIndex = cart.findIndex(item => item.id === id && item.size === selectedSize);
+
+    if (existingIndex !== -1) {
+      cart[existingIndex].quantity += 1;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity: 1,
+        size: selectedSize
+      });
+    }
+
+    updateCartCount();
+    alert(`เพิ่ม "${product.name}${selectedSize ? ' ขนาด ' + selectedSize : ''}" ลงตะกร้าเรียบร้อย`);
+  }
+
+  // ลบสินค้าในตะกร้า
+  function removeFromCart(index) {
+    if (index >= 0 && index < cart.length) {
+      cart.splice(index, 1);
+      updateCartCount();
+      renderCartItems();
+    }
+  }
+
+  // อัพเดตจำนวนสินค้าในตะกร้า
+  function updateCartCount() {
+    const totalCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+    cartCount.textContent = totalCount;
+  }
+
+  // แสดงตะกร้า
+  function showCart() {
+    cartModal.style.display = 'flex';
+    renderCartItems();
+  }
+
+  // ซ่อนตะกร้า
+  function hideCart() {
+    cartModal.style.display = 'none';
+  }
+
+  // แสดงรายการสินค้าตะกร้า
+  function renderCartItems() {
+    if (cart.length === 0) {
+      cartItemsList.innerHTML = '<li>ตะกร้าว่างเปล่า</li>';
+      return;
+    }
+    cartItemsList.innerHTML = '';
+    cart.forEach((item, index) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>${item.name}${item.size ? ' (' + item.size + ')' : ''} x ${item.quantity}</span>
+        <span>${item.price * item.quantity} บาท</span>
+        <button class="remove-btn" onclick="removeFromCart(${index})">ลบ</button>
+      `;
+      cartItemsList.appendChild(li);
+    });
+  }
+
+  // ตรวจสอบและยืนยันการชำระเงิน
+  function confirmPayment() {
+    if (cart.length === 0) {
+      alert('ตะกร้าว่างเปล่า โปรดเพิ่มสินค้าก่อนชำระเงิน');
+      return;
+    }
+    if (!slipUpload.files || slipUpload.files.length === 0) {
+      alert('กรุณาแนบสลิปการโอนเงินเพื่อยืนยัน');
+      return;
+    }
+
+    slipFile = slipUpload.files[0];
+    // **ที่นี่เป็นจุดที่ในระบบจริง จะส่งข้อมูลไปเซิร์ฟเวอร์และบันทึกสลิป**
+    // สำหรับเว็บนี้แค่แสดงสถานะและซ่อนตะกร้า
+
+    alert('ยืนยันการชำระเงินเรียบร้อย ระบบกำลังดำเนินการ');
+    slipUpload.value = ''; // รีเซ็ตช่องอัปโหลด
+    cart = [];
+    updateCartCount();
+    hideCart();
+    showOrderStatus();
+  }
+
+  // แสดงสถานะคำสั่งซื้อ
+  function showOrderStatus() {
+    orderStatusDiv.style.display = 'block';
+    productList.style.display = 'none';
+    cart.style.display = 'none';
+  }
+
+  // กลับสู่หน้าร้าน
+  function backToShop() {
+    orderStatusDiv.style.display = 'none';
+    productList.style.display = 'flex';
+    cart.style.display = 'flex';
+  }
+
+  // Event listeners
+  document.getElementById('cart').addEventListener('click', showCart);
+  closeBtn.addEventListener('click', hideCart);
+  confirmPaymentBtn.addEventListener('click', confirmPayment);
+  backToShopBtn.addEventListener('click', backToShop);
+  window.addEventListener('click', e => {
+    if (e.target === cartModal) {
+      hideCart();
+    }
+  });
+
+  // โหลดหน้าเว็บ
+  renderProducts();
+  updateCartCount();
+
+  // Expose functions to global scope for inline onclicks
+  window.addToCart = addToCart;
+  window.removeFromCart = removeFromCart;
+
+</script>
+
+</body>
+</html>
